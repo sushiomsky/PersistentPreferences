@@ -6,11 +6,10 @@ package com.suchomsky;
 import java.io.File;
 import java.sql.*;
 
-class PersistentPreferences {
+public class PersistentPreferences {
 
-    private static Connection connection;
     private static final String DB_PATH = System.getProperty("user.home") + "/" + "persistent_preferences.db";
-    private String tableName;
+    private static Connection connection;
 
     static {
 	try {
@@ -20,6 +19,8 @@ class PersistentPreferences {
 	    e.printStackTrace();
 	}
     }
+
+    private String tableName;
 
     public PersistentPreferences(String tableName) {
         initDBConnection();
