@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PersistentPreferences.iml" filepath="$PROJECT_DIR$/.idea/modules/PersistentPreferences.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PersistentPreferences_main.iml" filepath="$PROJECT_DIR$/.idea/modules/PersistentPreferences_main.iml" group="PersistentPreferences" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PersistentPreferences_test.iml" filepath="$PROJECT_DIR$/.idea/modules/PersistentPreferences_test.iml" group="PersistentPreferences" />
+    </modules>
+  </component>
+</project>
