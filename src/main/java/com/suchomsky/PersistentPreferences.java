@@ -52,7 +52,7 @@ public class PersistentPreferences {
 	 * Instantiates a new Persistent preferences.
 	 */
 	public PersistentPreferences() {
-		this(TABLENAME_DEFAULT, FILENAME_DEFAULT);
+		this(TABLENAME_DEFAULT);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class PersistentPreferences {
 		initDBConnection();
 		createTable();
 	}
-
+	
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
