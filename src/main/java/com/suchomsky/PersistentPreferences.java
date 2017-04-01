@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.suchomsky;
 
 import java.io.File;
