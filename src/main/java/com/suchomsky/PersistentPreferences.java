@@ -1,12 +1,39 @@
+/*
+ * *
+ *  * ${PROJECT_NAME}
+ *  * Copyright (c) ${YEAR} Dennis Suchomsky <dennis.suchomsky@gmail.com>
+ *  *
+ *  *  This program is free software: you can redistribute it and/or modify
+ *  *  it under the terms of the GNU General Public License as published by
+ *  *  the Free Software Foundation, either version 3 of the License, or
+ *  *  (at your option) any later version.
+ *  *
+ *  *  This program is distributed in the hope that it will be useful,
+ *  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  *  GNU General Public License for more details.
+ *  *
+ *  *  You should have received a copy of the GNU General Public License
+ *  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.suchomsky;
 
 import java.io.File;
 import java.sql.*;
 
+/**
+ * The type Persistent preferences.
+ */
 public class PersistentPreferences {
 
-	private static final String DB_PATH = System.getProperty("user.home") + "/" + "persistent_preferences.db";
-	private static Connection connection;
+
+	/**
+	 * The Filename default.
+	 */
+	static final String FILENAME_DEFAULT = "persistent_preferences.db";
+	static final String TABLENAME_DEFAULT = "persistent_preferences";
 
 	static {
 		try {
@@ -18,11 +45,47 @@ public class PersistentPreferences {
 	}
 
 	private String tableName;
+	private String dbPath;
+	private Connection connection;
 
+	/**
+	 * Instantiates a new Persistent preferences.
+	 */
+	public PersistentPreferences() {
+		this(TABLENAME_DEFAULT, FILENAME_DEFAULT);
+	}
+
+	/**
+	 * Instantiates a new Persistent preferences.
+	 *
+	 * @param tableName the table name
+	 */
 	public PersistentPreferences(String tableName) {
-		initDBConnection();
+		this(tableName, FILENAME_DEFAULT);
+	}
+
+	/**
+	 * Instantiates a new Persistent preferences.
+	 *
+	 * @param tableName the table name
+	 * @param dbName    the db name
+	 */
+	public PersistentPreferences(String tableName, String dbName) {
+		this.dbPath = System.getProperty("user.home") + "/" + dbName;
 		this.tableName = tableName;
+
+		initDBConnection();
 		createTable();
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		if (!connection.isClosed() && connection != null) {
+			connection.close();
+			if (connection.isClosed())
+				System.out.println("Connection to Database closed");
+		}
 	}
 
 	private void initDBConnection() {
@@ -30,7 +93,7 @@ public class PersistentPreferences {
 			if (connection != null)
 				return;
 			System.out.println("Creating Connection to Database...");
-			connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+			connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
 			if (!connection.isClosed())
 				System.out.println("...Connection established");
 		} catch (SQLException e) {
@@ -63,10 +126,18 @@ public class PersistentPreferences {
 		return false;
 	}
 
-	public void deleteTable() {
-		File file = new File(DB_PATH);
-		if (file.exists()) {
-			file.delete();
+	/**
+	 * Delete table.
+	 */
+	public boolean deleteTable() {
+		try {
+			File file = new File(dbPath);
+			if (file.exists()) {
+				file.delete();
+			}
+			return true;
+		} catch (Exception e){
+			return false;
 		}
 	}
 
@@ -97,6 +168,14 @@ public class PersistentPreferences {
 		}
 	}
 
+	/**
+	 * Sets param.
+	 *
+	 * @param key   the key
+	 * @param value the value
+	 *
+	 * @return the param
+	 */
 	public boolean setParam(String key, String value) {
 		String oldValue = getParam(key);
 		if (oldValue == null)
@@ -105,6 +184,13 @@ public class PersistentPreferences {
 			return updateParam(key, value);
 	}
 
+	/**
+	 * Gets param.
+	 *
+	 * @param key the key
+	 *
+	 * @return the param
+	 */
 	public String getParam(String key) {
 		String value = null;
 		try {
