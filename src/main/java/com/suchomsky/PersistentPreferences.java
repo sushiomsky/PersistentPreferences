@@ -34,6 +34,8 @@ public class PersistentPreferences {
 	 */
 	static final String FILENAME_DEFAULT = "persistent_preferences.db";
 	static final String TABLENAME_DEFAULT = "persistent_preferences";
+	private static volatile Connection connection;
+	private static volatile PersistentPreferences instance;
 
 	static {
 		try {
@@ -46,12 +48,11 @@ public class PersistentPreferences {
 
 	private String tableName;
 	private String dbPath;
-	private Connection connection;
 
 	/**
 	 * Instantiates a new Persistent preferences.
 	 */
-	public PersistentPreferences() {
+	private PersistentPreferences() {
 		this(TABLENAME_DEFAULT);
 	}
 
@@ -60,7 +61,7 @@ public class PersistentPreferences {
 	 *
 	 * @param tableName the table name
 	 */
-	public PersistentPreferences(String tableName) {
+	private PersistentPreferences(String tableName) {
 		this(tableName, FILENAME_DEFAULT);
 	}
 
@@ -70,14 +71,34 @@ public class PersistentPreferences {
 	 * @param tableName the table name
 	 * @param dbName    the db name
 	 */
-	public PersistentPreferences(String tableName, String dbName) {
+	private PersistentPreferences(String tableName, String dbName) {
 		this.dbPath = System.getProperty("user.home") + "/" + dbName;
 		this.tableName = tableName;
 
 		initDBConnection();
 		createTable();
 	}
-	
+
+	/**
+	 * Get Singleton instance
+	 *
+	 * @return instance of the class
+	 */
+	public static PersistentPreferences getInstance() {
+		final PersistentPreferences currentInstance;
+		if (instance == null) {
+			synchronized (PersistentPreferences.class) {
+				if (instance == null) {
+					instance = new PersistentPreferences();
+				}
+				currentInstance = instance;
+			}
+		} else {
+			currentInstance = instance;
+		}
+		return currentInstance;
+	}
+
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
